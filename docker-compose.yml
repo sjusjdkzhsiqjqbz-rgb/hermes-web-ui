@@ -1,0 +1,13 @@
+services:
+  hermes-web-ui:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      HERMES_WEB_HOST: 0.0.0.0
+      HERMES_WEB_PORT: 8000
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+      - ~/.hermes:/home/hermes/.hermes:ro
+    restart: unless-stopped

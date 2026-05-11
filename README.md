@@ -52,11 +52,34 @@ Or with uvicorn directly:
 uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
+## Docker
+
+Build and run the app with Docker Compose:
+
+```bash
+docker compose up --build
+# -> http://localhost:8000
+```
+
+The Compose setup keeps runtime state outside the image:
+
+- `./data:/app/data` for the SQLite database
+- `./uploads:/app/uploads` for uploaded files
+- `~/.hermes:/home/hermes/.hermes:ro` for the Hermes CLI config/model cache
+
+The container exposes a health check at `/health`. On startup, `docker-entrypoint.sh`
+creates the data/upload directories and initializes the SQLite schema before Uvicorn
+starts.
+
+The image contains the web UI dependencies. Chat responses still require the
+`hermes` CLI to be available in the container or provided by a custom image layer.
+
 ## API Endpoints
 
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/` | Chat UI |
+| GET | `/health` | Container health check |
 | GET | `/api/models` | Models from Hermes config + custom providers |
 | GET | `/api/personalities` | Available personalities |
 | GET/POST | `/api/sessions` | List/create sessions |
