@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes AI CLI - Web Interface</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-theme">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body data-theme="dark">
+    <div id="app">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h1>Hermes AI</h1>
+                <button id="new-chat-btn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    New Chat
+                </button>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <h3>Chat Sessions</h3>
+                    <div id="sessions-list" class="sessions-list">
+                        <!-- Sessions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="sidebar-controls">
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="control-btn" title="Toggle Theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                        <span>Theme</span>
+                    </button>
+                    
+                    <!-- Provider Manager Toggle -->
+                    <button id="provider-toggle" class="control-btn" title="Manage Providers">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <span>Providers</span>
+                    </button>
+                    
+                    <!-- Exports -->
+                    <div class="export-buttons">
+                        <button id="export-json" class="control-btn" title="Export as JSON" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <span>JSON</span>
+                        </button>
+                        <button id="export-markdown" class="control-btn" title="Export as Markdown" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                            <span>Markdown</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="model-selector">
+                    <label for="global-model">Model:</label>
+                    <select id="global-model">
+                        <option value="">Loading models...</option>
+                    </select>
+                    <input type="text" id="custom-model-input" class="hidden" placeholder="Enter custom model name...">
+                </div>
+                
+                <div class="personality-selector">
+                    <label for="global-personality">Personality:</label>
+                    <select id="global-personality">
+                        <!-- Personalities will be loaded here -->
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <!-- Chat Container -->
+            <div id="chat-container" class="chat-container">
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state">
+                    <div class="empty-state-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    <h2>Welcome to Hermes AI CLI</h2>
+                    <p>Start a new conversation or select an existing chat from the sidebar.</p>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" data-prompt="Explain quantum computing in simple terms">
+                            Explain quantum computing
+                        </button>
+                        <button class="quick-action-btn" data-prompt="Write a Python function to sort a list">
+                            Write Python sorting function
+                        </button>
+                        <button class="quick-action-btn" data-prompt="What are the benefits of meditation?">
+                            Benefits of meditation
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Messages Area -->
+                <div id="messages-area" class="messages-area hidden">
+                    <div id="messages-list" class="messages-list">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div id="input-area" class="input-area hidden">
+                <!-- File Upload Zone -->
+                <div id="drop-zone" class="drop-zone">
+                    <div class="drop-zone-content">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>Drop files here or click to upload (max 50MB)</span>
+                        <input type="file" id="file-input" multiple hidden>
+                    </div>
+                    <div id="uploaded-files" class="uploaded-files"></div>
+                </div>
+                
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="message-input" 
+                            placeholder="Type your message..." 
+                            rows="1"
+                            disabled
+                        ></textarea>
+                        <button id="send-btn" class="send-btn" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </div>
+                    <div class="input-footer">
+                        <div class="input-meta">
+                            <span id="model-indicator" class="model-indicator"></span>
+                            <span id="personality-indicator" class="personality-indicator"></span>
+                        </div>
+                        <span class="input-hint">Press Enter to send, Shift+Enter for new line</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Session Name Modal -->
+    <div id="session-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <h3>Rename Chat</h3>
+            <input type="text" id="session-name-input" placeholder="Enter chat name">
+            <div class="modal-actions">
+                <button id="cancel-rename" class="btn btn-secondary">Cancel</button>
+                <button id="confirm-rename" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <h3>Delete Chat</h3>
+            <p>Are you sure you want to delete this chat? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="cancel-delete" class="btn btn-secondary">Cancel</button>
+                <button id="confirm-delete" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Provider Manager Modal -->
+    <div id="provider-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-large">
+            <h3>Manage Providers</h3>
+            <div class="provider-list" id="provider-list">
+                <!-- Providers will be loaded here -->
+            </div>
+            <div class="provider-form">
+                <h4>Add New Provider</h4>
+                <input type="text" id="provider-name" placeholder="Provider Name (e.g., OpenAI, Anthropic)">
+                <input type="password" id="provider-api-key" placeholder="API Key">
+                <input type="text" id="provider-base-url" placeholder="Base URL (optional)">
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-provider" class="btn btn-secondary">Close</button>
+                <button id="add-provider" class="btn btn-primary">Add Provider</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="loading-indicator hidden">
+        <div class="spinner"></div>
+        <span>AI is thinking...</span>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
