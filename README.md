@@ -1,6 +1,8 @@
 # Hermes Web UI
 
 > ⚠️ **Vibe Coded** — This project was born in an AI-agent coding session and evolved iteratively through prompts. The code works but may surprise you. Found a bug? Fix it, laugh about it, or open a PR. All contributions welcome.
+>
+> 🧠 _Fun fact: the entire initial implementation was written by an AI agent in a single session. The AI also wrote this README. Meta enough for you?_
 
 A web interface for [Hermes Agent CLI](https://github.com/nousresearch/hermes-agent). FastAPI + vanilla HTML/CSS/JS. ChatGPT-like chat UI that calls `hermes chat -Q -q` under the hood.
 
