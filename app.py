@@ -464,6 +464,11 @@ async def get_chat_interface(request: Request):
     """Serve the main chat interface."""
     return templates.TemplateResponse(request, "index.html", {})
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for container orchestration."""
+    return {"status": "ok"}
+
 @app.get("/api/models")
 async def get_models():
     """Get available AI models from configured hermes providers."""
